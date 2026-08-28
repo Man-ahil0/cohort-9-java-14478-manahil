@@ -1,5 +1,5 @@
 package com.example.cohort_9_java_14478_manahil.security;
-
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
@@ -206,5 +206,43 @@ class JwtAuthenticationFilterTest {
 
         verify(filterChain)
                 .doFilter(request, response);
+    }
+    @Test
+    void filter_shouldContinueWhenJwtExceptionOccurs()
+            throws ServletException, IOException {
+
+        MockHttpServletRequest request =
+                new MockHttpServletRequest();
+
+        request.addHeader(
+                "Authorization",
+                "Bearer malformed-token"
+        );
+
+        MockHttpServletResponse response =
+                new MockHttpServletResponse();
+
+        when(jwtService.extractUsername("malformed-token"))
+                .thenThrow(new JwtException("Malformed JWT"));
+
+        filter.doFilter(
+                request,
+                response,
+                filterChain
+        );
+
+        assertNull(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+        );
+
+        verify(jwtService)
+                .extractUsername("malformed-token");
+
+        verify(filterChain)
+                .doFilter(request, response);
+
+        verifyNoInteractions(userDetailsService);
     }
 }
