@@ -1,5 +1,6 @@
 package com.example.cohort_9_java_14478_manahil.exception;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,7 +12,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    private static final Logger logger =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
     // Handle validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(
@@ -51,11 +53,16 @@ public class GlobalExceptionHandler {
         );
     }
     // Handle any unexpected errors
+    // Handle any unexpected errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
 
+        // Log the real exception server-side
+        logger.error("Unexpected error occurred", ex);
+
+        // Return only a generic message to the client
         return new ResponseEntity<>(
-                "Something went wrong: " + ex.getMessage(),
+                "An unexpected error occurred",
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }

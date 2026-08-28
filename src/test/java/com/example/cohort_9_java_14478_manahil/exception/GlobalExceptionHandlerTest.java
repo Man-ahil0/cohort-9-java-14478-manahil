@@ -85,10 +85,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleGeneralException_shouldReturnInternalServerError() {
+    void handleGeneralException_shouldReturnGenericMessage() {
 
         Exception exception =
-                new Exception("Unexpected error");
+                new Exception("Sensitive internal database error");
 
         ResponseEntity<String> response =
                 exceptionHandler.handleGeneralException(exception);
@@ -99,8 +99,12 @@ class GlobalExceptionHandlerTest {
         );
 
         assertEquals(
-                "Something went wrong: Unexpected error",
+                "An unexpected error occurred",
                 response.getBody()
+        );
+
+        assertFalse(
+                response.getBody().contains("Sensitive internal database error")
         );
     }
 
